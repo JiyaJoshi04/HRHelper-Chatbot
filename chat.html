@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HRHelper Chatbot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #ffe6f0, #d6e6ff);
+            font-family: Arial, sans-serif;
+        }
+        .chat-container {
+            max-width: 650px;
+            height: 80vh;
+            margin: 30px auto;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .chat-header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+        #chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .message-wrapper {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .user-message-wrapper {
+            justify-content: flex-end;
+        }
+        .user-message-wrapper .avatar {
+            margin-left: 8px;
+            margin-right: 0;
+        }
+        .user-message, .bot-message {
+            padding: 10px 14px;
+            border-radius: 10px;
+            max-width: 75%;
+        }
+        .user-message {
+            background: #007bff;
+            color: white;
+            border-bottom-right-radius: 0;
+        }
+        .bot-message {
+            background: #f1f0f0;
+            color: #333;
+            border-bottom-left-radius: 0;
+        }
+        .suggested-btn {
+            margin: 5px 5px 0 0;
+        }
+        .typing {
+            font-style: italic;
+            color: gray;
+            font-size: 0.9em;
+        }
+        .input-area {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">🤖 HRHelper Chatbot</div>
+    <div id="chat-box" class="mb-3"></div>
+
+    <!-- Suggested Questions -->
+    <div class="mb-2">
+        <strong>💡 Suggested Questions:</strong><br>
+        {% for faq in faqs %}
+            <button class="btn btn-outline-primary suggested-btn" onclick="sendSuggested('{{ faq.question }}')">
+                {{ faq.question }}
+            </button>
+        {% endfor %}
+    </div>
+
+    <!-- Follow-up Suggestions -->
+    <div id="follow-up" class="mt-2"></div>
+
+    <!-- User Input -->
+    <div class="input-area">
+        <input type="text" id="user-input" class="form-control" placeholder="Ask me anything about HR policies...">
+        <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+function sendSuggested(question) {
+    document.getElementById("user-input").value = question;
+    sendMessage();
+    showFollowUp(question);
+}
+
+function showFollowUp(question) {
+    const followUpDiv = document.getElementById("follow-up");
+    followUpDiv.innerHTML = "";
+
+    let followUps = {
+        "leave policy": ["How many sick leaves do I get?", "What is the casual leave policy?"],
+        "salary": ["When is salary credited?", "How can I get salary slip?"],
+        "hello": ["Hi there!", "How are you?"]
+    };
+
+    let key = Object.keys(followUps).find(k => question.toLowerCase().includes(k));
+    if (key) {
+        followUpDiv.innerHTML = "<strong>🔍 You can also ask:</strong><br>";
+        followUps[key].forEach(q => {
+            followUpDiv.innerHTML += `<button class="btn btn-outline-secondary suggested-btn" onclick="sendSuggested('${q}')">${q}</button>`;
+        });
+    }
+}
+
+async function sendMessage() {
+    const input = document.getElementById("user-input");
+    const message = input.value.trim();
+    if (!message) return;
+
+    const chatBox = document.getElementById("chat-box");
+
+    chatBox.innerHTML += `
+    <div class="message-wrapper user-message-wrapper">
+        <div class="user-message">${message}</div>
+        <img src="/static/user.png" class="avatar" alt="User">
+    </div>`;
+    input.value = "";
+
+    const typingDiv = document.createElement("div");
+    typingDiv.classList.add("typing");
+    typingDiv.innerText = "HRHelper is typing...";
+    chatBox.appendChild(typingDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try {
+        const response = await fetch("/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question: message })
+        });
+        const data = await response.json();
+
+        chatBox.removeChild(typingDiv);
+        chatBox.innerHTML += `
+        <div class="message-wrapper">
+            <img src="/static/bot.png" class="avatar" alt="Bot">
+            <div class="bot-message">${data.answer}</div>
+        </div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+    } catch (error) {
+        chatBox.removeChild(typingDiv);
+        chatBox.innerHTML += `<div class="bot-message text-danger">Error: Could not connect to server.</div>`;
+    }
+}
+</script>
+
+</body>
+</html>
+
+
