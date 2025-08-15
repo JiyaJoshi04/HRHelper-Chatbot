@@ -1,0 +1,35 @@
+[
+    {
+        "question": "Tell me about leave rules",
+        "answer": "Employees are entitled to 12 paid leaves per year."
+    },
+    {
+        "question": "What are the office working hours?",
+        "answer": "Our office hours are 9:00 AM to 6:00 PM, Monday to Friday."
+    },
+    {
+        "question": "What is the dress code?",
+        "answer": "The dress code is smart casual from Monday to Thursday and casual on Fridays."
+    },
+    {
+        "question": "How can I apply for work from home?",
+        "answer": "You can apply for work from home through the HR portal with prior manager approval."
+    },
+{
+    "question": "Tell me about the company",
+    "answer": "Our company is committed to innovation, employee growth, and customer satisfaction."
+},
+ {
+        "question": "When is the salary credited?",
+        "answer": "Salaries are credited to employees' bank accounts on the last working day of each month."
+    },
+    {
+        "question": "Hello",
+        "answer": "Hello! 👋 How can I help you today?"
+    },
+    {
+        "question": "Hi",
+        "answer": "Hi there! 😊 What HR-related information would you like to know?"
+    }
+]
+
