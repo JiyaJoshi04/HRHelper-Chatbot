@@ -21,6 +21,7 @@ pip install -r requirements.txt
 Setup Environment Variables
 Create a .env file in the root folder:
 SLACK_BOT_TOKEN=xoxb-your-slack-bot-token
+
 SLACK_SIGNING_SECRET=your-slack-signing-secret
 
 Running the App
@@ -29,10 +30,15 @@ uvicorn app.main:app --reload
 
 Slack Integration Setup
 Create a Slack App in Slack API.
+
 Bot Token Scopes: app_mentions:read, chat:write, commands
+
 Event Subscriptions → Subscribe to app_mention.
+
 Set Request URL to your public ngrok URL + /slack/events.
+
 Install the app to your workspace.
+
 Invite the bot to a Slack channel:/invite @HRHelper
 
 
